@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import {
   weeks, days, hours, minutes, seconds, milliseconds,
-  fromDate, fromNow
+  fromDate, fromNow,
 } from '../src/index.js';
 
 describe('DurationBuilder – weeks()', () => {
@@ -14,7 +14,7 @@ describe('DurationBuilder – weeks()', () => {
   });
 
   it('days(14).weeks() === 2', () => {
-    expect(days(15).weeks()).to.equal(15/7);
+    expect(days(15).weeks()).to.equal(15 / 7);
   });
 
   it('weeks(1).days(1).weeks() ≅ 1 + 1⁄7', () => {
@@ -42,8 +42,8 @@ describe('RelativeBuilder – calendar diff edge-cases', () => {
 
   it('month-end roll-over 31 Jan → 28 Feb', () => {
     const ts = fromDate(new Date('2021-01-31T00:00:00Z'))
-                 .months(1)
-                 .timestamp();
+      .months(1)
+      .timestamp();
     expect(new Date(ts).toISOString())
       .to.equal('2021-02-28T00:00:00.000Z');
   });
@@ -104,7 +104,7 @@ describe('fromDate – input types', () => {
   });
 
   it('throws error for invalid input types', () => {
-    expect(() => fromDate({} as any)).to.throw('fromDate: Input must be a Date object, timestamp (number), or ISO date string');
+    expect(() => fromDate({} as Date | number | string)).to.throw('fromDate: Input must be a Date object, timestamp (number), or ISO date string');
   });
 });
 
@@ -164,7 +164,7 @@ describe('RelativeBuilder – negative time travel', () => {
   it('negative years work correctly', () => {
     const result = fromDate(baseDate).years(-2);
     expect(result.years()).to.equal(-2);
-    
+
     const timestamp = result.timestamp();
     const resultDate = new Date(timestamp);
     expect(resultDate.getFullYear()).to.equal(2021);
@@ -173,7 +173,7 @@ describe('RelativeBuilder – negative time travel', () => {
   it('negative months work correctly', () => {
     const result = fromDate(baseDate).months(-6);
     expect(result.months()).to.equal(-6);
-    
+
     const timestamp = result.timestamp();
     const resultDate = new Date(timestamp);
     expect(resultDate.getMonth()).to.equal(11); // December (0-indexed)
@@ -184,7 +184,7 @@ describe('RelativeBuilder – negative time travel', () => {
     const result = fromDate(baseDate).weeks(-2);
     expect(result.weeks()).to.equal(-2);
     expect(result.days()).to.equal(-14);
-    
+
     const timestamp = result.timestamp();
     const resultDate = new Date(timestamp);
     expect(resultDate.getDate()).to.equal(1); // June 15 - 14 days = June 1
@@ -193,7 +193,7 @@ describe('RelativeBuilder – negative time travel', () => {
   it('negative days work correctly', () => {
     const result = fromDate(baseDate).days(-10);
     expect(result.days()).to.equal(-10);
-    
+
     const timestamp = result.timestamp();
     const resultDate = new Date(timestamp);
     expect(resultDate.getDate()).to.equal(5); // June 15 - 10 days = June 5
@@ -202,7 +202,7 @@ describe('RelativeBuilder – negative time travel', () => {
   it('negative hours work correctly', () => {
     const result = fromDate(baseDate).hours(-6);
     expect(result.hours()).to.equal(-6);
-    
+
     const timestamp = result.timestamp();
     const resultDate = new Date(timestamp);
     expect(resultDate.getUTCHours()).to.equal(6); // 12:00 - 6 hours = 06:00 UTC
@@ -211,7 +211,7 @@ describe('RelativeBuilder – negative time travel', () => {
   it('negative minutes work correctly', () => {
     const result = fromDate(baseDate).minutes(-30);
     expect(result.minutes()).to.equal(-30);
-    
+
     const timestamp = result.timestamp();
     const resultDate = new Date(timestamp);
     expect(resultDate.getUTCMinutes()).to.equal(30); // 12:00 - 30 min = 11:30 UTC
@@ -221,7 +221,7 @@ describe('RelativeBuilder – negative time travel', () => {
   it('negative seconds work correctly', () => {
     const result = fromDate(baseDate).seconds(-45);
     expect(result.seconds()).to.equal(-45);
-    
+
     const timestamp = result.timestamp();
     const resultDate = new Date(timestamp);
     expect(resultDate.getUTCSeconds()).to.equal(15); // :00 - 45 sec = previous minute :15
@@ -230,7 +230,7 @@ describe('RelativeBuilder – negative time travel', () => {
   it('negative milliseconds work correctly', () => {
     const result = fromDate(baseDate).milliseconds(-500);
     expect(result.milliseconds()).to.equal(-500);
-    
+
     const timestamp = result.timestamp();
     expect(timestamp).to.equal(baseDate.getTime() - 500);
   });
@@ -239,7 +239,7 @@ describe('RelativeBuilder – negative time travel', () => {
     // Now this should work with sequential application of offsets
     const result = fromDate(baseDate).years(1).months(-3).days(5);
     expect(result.years()).to.be.closeTo(0.76, 0.02); // ~9 months and 5 days, accounting for calendar complexity
-    
+
     const timestamp = result.timestamp();
     const resultDate = new Date(timestamp);
     expect(resultDate.getFullYear()).to.equal(2024);
@@ -251,7 +251,7 @@ describe('RelativeBuilder – negative time travel', () => {
     // Sequential operations work fine, unlike mixed-sign in single operation
     const result = fromDate(baseDate).years(1).months(-3);
     expect(result.years()).to.be.closeTo(0.75, 0.01); // ~9 months = 0.75 years
-    
+
     const timestamp = result.timestamp();
     const resultDate = new Date(timestamp);
     expect(resultDate.getFullYear()).to.equal(2024);
@@ -261,7 +261,7 @@ describe('RelativeBuilder – negative time travel', () => {
   it('going back across year boundary', () => {
     const newYear = new Date('2023-01-15T00:00:00Z');
     const result = fromDate(newYear).months(-2);
-    
+
     const timestamp = result.timestamp();
     const resultDate = new Date(timestamp);
     expect(resultDate.getFullYear()).to.equal(2022);
@@ -271,7 +271,7 @@ describe('RelativeBuilder – negative time travel', () => {
   it('negative leap year handling', () => {
     const leapDay = new Date('2020-02-29T00:00:00Z');
     const result = fromDate(leapDay).years(-1);
-    
+
     const timestamp = result.timestamp();
     const resultDate = new Date(timestamp);
     expect(resultDate.getFullYear()).to.equal(2019);
@@ -282,7 +282,7 @@ describe('RelativeBuilder – negative time travel', () => {
   it('large negative values', () => {
     const result = fromDate(baseDate).years(-100);
     expect(result.years()).to.equal(-100);
-    
+
     const timestamp = result.timestamp();
     const resultDate = new Date(timestamp);
     expect(resultDate.getFullYear()).to.equal(1923);
@@ -297,7 +297,7 @@ describe('RelativeBuilder – negative time travel', () => {
   it('combinations that go negative overall', () => {
     const result = fromDate(baseDate).days(3).days(-10);
     expect(result.days()).to.equal(-7);
-    
+
     const timestamp = result.timestamp();
     expect(timestamp).to.be.lessThan(baseDate.getTime());
   });

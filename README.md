@@ -54,11 +54,12 @@ Methods:
 - `.months(n : number)`
 - `.weeks(n : number)`
 - `.days(n : number)`
-- `.hours(n : number)`- `minutes(n : number)`
-- `seconds(n : number)`
-- `milliseconds(n : number)`
+- `.hours(n : number)`
+- `.minutes(n : number)`
+- `.seconds(n : number)`
+- `.milliseconds(n : number)`
 
-Relative/calendar units (`fromDate`, `fromNow`) **require whole integers** because Temporal's calendar operations forbids fractional months, days, etc.
+Relative/calendar units (`fromDate`, `fromNow`) **require whole integers** because Temporal's calendar operations forbids fractional time units, etc.
 
 Getters:
 
@@ -83,4 +84,4 @@ All methods are chainable and act as getters if called with no arguments:
 - `seconds(n : number)`
 - `milliseconds(n : number)`
 
-_All_ fixed-duration factory functions accept **integers or decimals** (positive or negative):
+_All_ fixed-duration factory functions accept **integers or decimals** (positive or negative).

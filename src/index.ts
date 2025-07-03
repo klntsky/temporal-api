@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { Temporal } from '@js-temporal/polyfill';
 
 /* ------------------------------------------------------------------------ */
@@ -10,7 +9,7 @@ const MS = {
   minute: 60_000,
   hour: 3_600_000,
   day: 86_400_000,
-  week: 604_800_000          // 7 × 24 h
+  week: 604_800_000,          // 7 × 24 h
 } as const;
 
 /* ------------------------------------------------------------------------ */
@@ -20,7 +19,7 @@ const MS = {
  * Ensures a value is a finite number (integers or decimals).
  * Throws a descriptive error with the caller's name on failure.
  */
-function assertFiniteNumber(value: number, caller: string): void {
+function assertFiniteNumber (value: number, caller: string): void {
   if (!Number.isFinite(value)) {
     throw new Error(`${caller}: value must be a finite number`);
   }
@@ -33,7 +32,7 @@ function assertFiniteNumber(value: number, caller: string): void {
  * Ensures a value is a finite, safe integer (no decimals).
  * Used by calendar-aware operations which must receive whole units.
  */
-function assertSafeInt(value: number, caller: string): void {
+function assertSafeInt (value: number, caller: string): void {
   if (!Number.isFinite(value)) {
     throw new Error(`${caller}: value must be a finite integer`);
   }
@@ -51,7 +50,7 @@ function assertSafeInt(value: number, caller: string): void {
  */
 class DurationBuilder {
   private total = 0;                        /* ms */
-  private add(ms: number) { this.total += ms; return this; }
+  private add (ms: number) { this.total += ms; return this; }
 
   /**
    * Sets or gets the number of weeks.
@@ -62,8 +61,8 @@ class DurationBuilder {
    * weeks(2).days(1).weeks() // Returns ~2.14 (2 weeks + 1 day)
    */
   weeks(n: number): DurationBuilder; weeks(): number;
-  weeks(n?: number): any { return n === undefined ? this.total / MS.week
-                                                  : (assertFiniteNumber(n, 'weeks'), this.add(n * MS.week)); }
+  weeks (n?: number): DurationBuilder | number { return n === undefined ? this.total / MS.week
+    : (assertFiniteNumber(n, 'weeks'), this.add(n * MS.week)); }
 
   /**
    * Sets or gets the number of days.
@@ -74,8 +73,8 @@ class DurationBuilder {
    * days(1).hours(12).days() // Returns 1.5 (1.5 days)
    */
   days(n: number): DurationBuilder; days(): number;
-  days(n?: number): any { return n === undefined ? this.total / MS.day
-                                                 : (assertFiniteNumber(n, 'days'), this.add(n * MS.day)); }
+  days (n?: number): DurationBuilder | number { return n === undefined ? this.total / MS.day
+    : (assertFiniteNumber(n, 'days'), this.add(n * MS.day)); }
 
   /**
    * Sets or gets the number of hours.
@@ -86,8 +85,8 @@ class DurationBuilder {
    * hours(1).minutes(30).hours() // Returns 1.5 (1.5 hours)
    */
   hours(n: number): DurationBuilder; hours(): number;
-  hours(n?: number): any { return n === undefined ? this.total / MS.hour
-                                                  : (assertFiniteNumber(n, 'hours'), this.add(n * MS.hour)); }
+  hours (n?: number): DurationBuilder | number { return n === undefined ? this.total / MS.hour
+    : (assertFiniteNumber(n, 'hours'), this.add(n * MS.hour)); }
 
   /**
    * Sets or gets the number of minutes.
@@ -98,8 +97,8 @@ class DurationBuilder {
    * minutes(30).seconds(30).minutes() // Returns 30.5 (30.5 minutes)
    */
   minutes(n: number): DurationBuilder; minutes(): number;
-  minutes(n?: number): any { return n === undefined ? this.total / MS.minute
-                                                    : (assertFiniteNumber(n, 'minutes'), this.add(n * MS.minute)); }
+  minutes (n?: number): DurationBuilder | number { return n === undefined ? this.total / MS.minute
+    : (assertFiniteNumber(n, 'minutes'), this.add(n * MS.minute)); }
 
   /**
    * Sets or gets the number of seconds.
@@ -110,8 +109,8 @@ class DurationBuilder {
    * seconds(30).milliseconds(500).seconds() // Returns 30.5 (30.5 seconds)
    */
   seconds(n: number): DurationBuilder; seconds(): number;
-  seconds(n?: number): any { return n === undefined ? this.total / MS.second
-                                                    : (assertFiniteNumber(n, 'seconds'), this.add(n * MS.second)); }
+  seconds (n?: number): DurationBuilder | number { return n === undefined ? this.total / MS.second
+    : (assertFiniteNumber(n, 'seconds'), this.add(n * MS.second)); }
 
   /**
    * Sets or gets the number of milliseconds.
@@ -122,8 +121,8 @@ class DurationBuilder {
    * milliseconds(500).seconds(1).milliseconds() // Returns 1500 (1.5 seconds)
    */
   milliseconds(n: number): DurationBuilder; milliseconds(): number;
-  milliseconds(n?: number): any { return n === undefined ? this.total
-                                                         : (assertFiniteNumber(n, 'milliseconds'), this.add(n)); }
+  milliseconds (n?: number): DurationBuilder | number { return n === undefined ? this.total
+    : (assertFiniteNumber(n, 'milliseconds'), this.add(n)); }
 }
 
 /**
@@ -194,7 +193,7 @@ interface Offsets {
   hours: number; minutes: number; seconds: number; milliseconds: number;
 }
 const ZERO: Offsets = { years:0, months:0, days:0, hours:0,
-                        minutes:0, seconds:0, milliseconds:0 };
+  minutes:0, seconds:0, milliseconds:0 };
 
 /**
  * Builder for calendar-aware date/time calculations relative to an anchor date.
@@ -206,8 +205,8 @@ class RelativeBuilder {
   private readonly anchorMs: number;
   private readonly off: Offsets;
 
-  constructor(anchor: Date | Temporal.PlainDateTime,
-              off: Offsets = { ...ZERO }) {
+  constructor (anchor: Date | Temporal.PlainDateTime,
+    off: Offsets = { ...ZERO }) {
     if (anchor instanceof Date) {
       const inst = Temporal.Instant.fromEpochMilliseconds(anchor.getTime());
       this.anchorPlain = inst.toZonedDateTimeISO('UTC').toPlainDateTime();
@@ -215,23 +214,23 @@ class RelativeBuilder {
     } else {
       this.anchorPlain = anchor;
       this.anchorMs = Number(
-        anchor.toZonedDateTime('UTC').toInstant().epochMilliseconds
+        anchor.toZonedDateTime('UTC').toInstant().epochMilliseconds,
       );
     }
     this.off = off;
   }
 
-  private plus(patch: Partial<Offsets>) {
+  private plus (patch: Partial<Offsets>) {
     return new RelativeBuilder(this.anchorPlain, { ...this.off, ...patch });
   }
 
-  private targetPlain(): Temporal.PlainDateTime {
+  private targetPlain (): Temporal.PlainDateTime {
     let result = this.anchorPlain;
-    
+
     // Apply each offset individually to handle mixed signs
     // Temporal does not support mixed-sign offsets in a single operation
     const offsetOrder: (keyof Offsets)[] = [
-      'years', 'months', 'days', 'hours', 'minutes', 'seconds', 'milliseconds'
+      'years', 'months', 'days', 'hours', 'minutes', 'seconds', 'milliseconds',
     ];
 
     for (const unit of offsetOrder) {
@@ -240,21 +239,21 @@ class RelativeBuilder {
         result = result.add({ [unit]: value });
       }
     }
-    
+
     return result;
   }
 
-  private deltaMs(): number {
+  private deltaMs (): number {
     const tgtMs = Number(
       this.targetPlain()
-          .toZonedDateTime('UTC')
-          .toInstant().epochMilliseconds
+        .toZonedDateTime('UTC')
+        .toInstant().epochMilliseconds,
     );
     return tgtMs - this.anchorMs;
   }
 
   /* ─ fractional helpers ─ */
-  private monthsFraction(): number {
+  private monthsFraction (): number {
     const target = this.targetPlain();
     const diff = this.anchorPlain.until(target, { largestUnit: 'months' });
     const whole = diff.years * 12 + diff.months;
@@ -276,7 +275,7 @@ class RelativeBuilder {
     return whole;
   }
 
-  private yearsFraction(): number { return this.monthsFraction() / 12; }
+  private yearsFraction (): number { return this.monthsFraction() / 12; }
 
   /**
    * Adds years to the calculation or gets the current years difference.
@@ -288,9 +287,9 @@ class RelativeBuilder {
    * fromDate('2020-01-01').years(2).years() // Returns 2
    */
   years(n: number): RelativeBuilder; years(): number;
-  years(n?: number): any {
+  years (n?: number): RelativeBuilder | number {
     return n === undefined ? this.yearsFraction()
-                           : (assertSafeInt(n, 'years'), this.plus({ years: this.off.years + n }));
+      : (assertSafeInt(n, 'years'), this.plus({ years: this.off.years + n }));
   }
 
   /**
@@ -303,9 +302,9 @@ class RelativeBuilder {
    * fromDate('2021-01-01').months(6).months() // Returns 6
    */
   months(n: number): RelativeBuilder; months(): number;
-  months(n?: number): any {
+  months (n?: number): RelativeBuilder | number {
     return n === undefined ? this.monthsFraction()
-                           : (assertSafeInt(n, 'months'), this.plus({ months: this.off.months + n }));
+      : (assertSafeInt(n, 'months'), this.plus({ months: this.off.months + n }));
   }
 
   /**
@@ -317,9 +316,9 @@ class RelativeBuilder {
    * fromDate('2023-01-01').days(14).weeks() // Returns 2
    */
   weeks(n: number): RelativeBuilder; weeks(): number;
-  weeks(n?: number): any {
+  weeks (n?: number): RelativeBuilder | number {
     return n === undefined ? this.deltaMs() / MS.week
-                           : (assertSafeInt(n, 'weeks'), this.plus({ days: this.off.days + n * 7 }));
+      : (assertSafeInt(n, 'weeks'), this.plus({ days: this.off.days + n * 7 }));
   }
 
   /**
@@ -331,9 +330,9 @@ class RelativeBuilder {
    * fromDate('2023-01-01').weeks(1).days() // Returns 7
    */
   days(n: number): RelativeBuilder; days(): number;
-  days(n?: number): any {
+  days (n?: number): RelativeBuilder | number {
     return n === undefined ? this.deltaMs() / MS.day
-                           : (assertSafeInt(n, 'days'), this.plus({ days: this.off.days + n }));
+      : (assertSafeInt(n, 'days'), this.plus({ days: this.off.days + n }));
   }
 
   /**
@@ -345,9 +344,9 @@ class RelativeBuilder {
    * fromDate('2023-01-01T00:00:00Z').days(1).hours() // Returns 24
    */
   hours(n: number): RelativeBuilder; hours(): number;
-  hours(n?: number): any {
+  hours (n?: number): RelativeBuilder | number {
     return n === undefined ? this.deltaMs() / MS.hour
-                           : (assertSafeInt(n, 'hours'), this.plus({ hours: this.off.hours + n }));
+      : (assertSafeInt(n, 'hours'), this.plus({ hours: this.off.hours + n }));
   }
 
   /**
@@ -359,9 +358,9 @@ class RelativeBuilder {
    * fromDate('2023-01-01T00:00:00Z').hours(1).minutes() // Returns 60
    */
   minutes(n: number): RelativeBuilder; minutes(): number;
-  minutes(n?: number): any {
+  minutes (n?: number): RelativeBuilder | number {
     return n === undefined ? this.deltaMs() / MS.minute
-                           : (assertSafeInt(n, 'minutes'), this.plus({ minutes: this.off.minutes + n }));
+      : (assertSafeInt(n, 'minutes'), this.plus({ minutes: this.off.minutes + n }));
   }
 
   /**
@@ -373,9 +372,9 @@ class RelativeBuilder {
    * fromDate('2023-01-01T00:00:00Z').minutes(1).seconds() // Returns 60
    */
   seconds(n: number): RelativeBuilder; seconds(): number;
-  seconds(n?: number): any {
+  seconds (n?: number): RelativeBuilder | number {
     return n === undefined ? this.deltaMs() / MS.second
-                           : (assertSafeInt(n, 'seconds'), this.plus({ seconds: this.off.seconds + n }));
+      : (assertSafeInt(n, 'seconds'), this.plus({ seconds: this.off.seconds + n }));
   }
 
   /**
@@ -387,9 +386,9 @@ class RelativeBuilder {
    * fromDate('2023-01-01T00:00:00Z').seconds(1).milliseconds() // Returns 1000
    */
   milliseconds(n: number): RelativeBuilder; milliseconds(): number;
-  milliseconds(n?: number): any {
+  milliseconds (n?: number): RelativeBuilder | number {
     return n === undefined ? this.deltaMs()
-                           : (assertSafeInt(n, 'milliseconds'), this.plus({ milliseconds: this.off.milliseconds + n }));
+      : (assertSafeInt(n, 'milliseconds'), this.plus({ milliseconds: this.off.milliseconds + n }));
   }
 
   /**
@@ -399,7 +398,7 @@ class RelativeBuilder {
    * fromDate('2023-01-01T00:00:00Z').days(1).timestamp() // Returns timestamp for 2023-01-02
    * new Date(fromDate('2023-01-01').months(6).timestamp()) // Convert back to Date
    */
-  timestamp() { return this.deltaMs() + this.anchorMs; }
+  timestamp () { return this.deltaMs() + this.anchorMs; }
 }
 
 /**
@@ -414,7 +413,7 @@ class RelativeBuilder {
  */
 export const fromDate = (d: Date | number | string): RelativeBuilder => {
   let date: Date;
-  
+
   if (d instanceof Date) {
     date = new Date(d);
   } else if (typeof d === 'number') {
@@ -425,11 +424,11 @@ export const fromDate = (d: Date | number | string): RelativeBuilder => {
   } else {
     throw new Error('fromDate: Input must be a Date object, timestamp (number), or ISO date string');
   }
-  
+
   if (isNaN(date.getTime())) {
     throw new Error('fromDate: Invalid date input');
   }
-  
+
   return new RelativeBuilder(date);
 };
 
