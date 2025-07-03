@@ -2,25 +2,47 @@
   "name": "temporal-api",
   "version": "1.0.0",
   "description": "Time DSL library with calendar-aware arithmetic, using tc39 Temporal API.",
+  "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "exports": "./dist/index.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist/index.js",
+    "dist/index.js.map",
+    "dist/index.d.ts",
+    "README.md"
+  ],
   "keywords": [
     "time",
     "temporal",
     "date",
-    "typescript"
+    "typescript",
+    "date"
   ],
   "author": "klntsky",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/klntsky/temporal-api.git"
+  },
+  "bugs": {
+    "url": "https://github.com/klntsky/temporal-api/issues"
+  },
+  "homepage": "https://github.com/klntsky/temporal-api",
   "engines": {
     "node": ">=18"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.build.json",
     "test": "mocha --require tsx \"test/**/*.test.ts\"",
     "lint": "eslint \"src/**/*.ts\" \"test/**/*.ts\"",
-    "format": "eslint \"src/**/*.ts\" \"test/**/*.ts\" --fix"
+    "format": "eslint \"src/**/*.ts\" \"test/**/*.ts\" --fix",
+    "prepublishOnly": "npm run build && npm run test && npm run lint"
   },
   "dependencies": {
     "@js-temporal/polyfill": "^0.4.4"
