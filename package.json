@@ -1,7 +1,7 @@
 {
   "name": "temporal-api",
   "version": "1.0.0",
-  "description": "Time DSL library with calendar-aware arithmetic, using tc39 Temporal API.",
+  "description": "Time definition library with calendar-aware arithmetic, using tc39 Temporal API.",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
