@@ -1,0 +1,33 @@
+{
+  "name": "temporal-api",
+  "version": "1.0.0",
+  "description": "Time DSL library with calendar-aware arithmetic, using tc39 Temporal API.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": "./dist/index.js",
+  "keywords": ["time", "dsl", "temporal", "date", "typescript"],
+  "author": "klntsky",
+  "license": "MIT",
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "mocha --require tsx \"test/**/*.test.ts\"",
+    "lint": "eslint \"src/**/*.ts\" \"test/**/*.ts\""
+  },
+  "dependencies": {
+    "@js-temporal/polyfill": "^0.4.4"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.3.5",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "^20.5.1",
+    "@typescript-eslint/eslint-plugin": "^7.1.0",
+    "@typescript-eslint/parser": "^7.1.0",
+    "chai": "^4.3.10",
+    "eslint": "^9.0.0",
+    "eslint-config-standard-with-typescript": "^35.0.0",
+    "mocha": "^10.3.0",
+    "tsx": "^4.6.0",
+    "typescript": "^5.5.0"
+  }
+}
