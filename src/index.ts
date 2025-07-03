@@ -14,11 +14,39 @@ const MS = {
 } as const;
 
 /* ------------------------------------------------------------------------ */
-/* 1) Pure-duration builder: fixed-size units                               */
+/* Helpers                                                                  */
 /* ------------------------------------------------------------------------ */
 /**
+ * Ensures a value is a finite number (integers or decimals).
+ * Throws a descriptive error with the caller's name on failure.
+ */
+function assertFiniteNumber(value: number, caller: string): void {
+  if (!Number.isFinite(value)) {
+    throw new Error(`${caller}: value must be a finite number`);
+  }
+  if (!Number.isSafeInteger(Math.trunc(value))) {
+    throw new Error(`${caller}: absolute value exceeds safe range`);
+  }
+}
+
+/**
+ * Ensures a value is a finite, safe integer (no decimals).
+ * Used by calendar-aware operations which must receive whole units.
+ */
+function assertSafeInt(value: number, caller: string): void {
+  if (!Number.isFinite(value)) {
+    throw new Error(`${caller}: value must be a finite integer`);
+  }
+  if (!Number.isInteger(value)) {
+    throw new Error(`${caller}: value must be an integer (no decimals)`);
+  }
+  if (!Number.isSafeInteger(value)) {
+    throw new Error(`${caller}: value exceeds safe integer range`);
+  }
+}
+
+/**
  * Builder for creating and manipulating fixed-duration time periods.
- * Supports weeks, days, hours, minutes, seconds, and milliseconds.
  * All calculations use fixed conversion rates (e.g., 1 week = 7 days = 168 hours).
  */
 class DurationBuilder {
@@ -35,7 +63,7 @@ class DurationBuilder {
    */
   weeks(n: number): DurationBuilder; weeks(): number;
   weeks(n?: number): any { return n === undefined ? this.total / MS.week
-                                                  : this.add(n * MS.week); }
+                                                  : (assertFiniteNumber(n, 'weeks'), this.add(n * MS.week)); }
 
   /**
    * Sets or gets the number of days.
@@ -47,7 +75,7 @@ class DurationBuilder {
    */
   days(n: number): DurationBuilder; days(): number;
   days(n?: number): any { return n === undefined ? this.total / MS.day
-                                                 : this.add(n * MS.day); }
+                                                 : (assertFiniteNumber(n, 'days'), this.add(n * MS.day)); }
 
   /**
    * Sets or gets the number of hours.
@@ -59,7 +87,7 @@ class DurationBuilder {
    */
   hours(n: number): DurationBuilder; hours(): number;
   hours(n?: number): any { return n === undefined ? this.total / MS.hour
-                                                  : this.add(n * MS.hour); }
+                                                  : (assertFiniteNumber(n, 'hours'), this.add(n * MS.hour)); }
 
   /**
    * Sets or gets the number of minutes.
@@ -71,7 +99,7 @@ class DurationBuilder {
    */
   minutes(n: number): DurationBuilder; minutes(): number;
   minutes(n?: number): any { return n === undefined ? this.total / MS.minute
-                                                    : this.add(n * MS.minute); }
+                                                    : (assertFiniteNumber(n, 'minutes'), this.add(n * MS.minute)); }
 
   /**
    * Sets or gets the number of seconds.
@@ -83,7 +111,7 @@ class DurationBuilder {
    */
   seconds(n: number): DurationBuilder; seconds(): number;
   seconds(n?: number): any { return n === undefined ? this.total / MS.second
-                                                    : this.add(n * MS.second); }
+                                                    : (assertFiniteNumber(n, 'seconds'), this.add(n * MS.second)); }
 
   /**
    * Sets or gets the number of milliseconds.
@@ -95,7 +123,7 @@ class DurationBuilder {
    */
   milliseconds(n: number): DurationBuilder; milliseconds(): number;
   milliseconds(n?: number): any { return n === undefined ? this.total
-                                                         : this.add(n); }
+                                                         : (assertFiniteNumber(n, 'milliseconds'), this.add(n)); }
 }
 
 /**
@@ -262,7 +290,7 @@ class RelativeBuilder {
   years(n: number): RelativeBuilder; years(): number;
   years(n?: number): any {
     return n === undefined ? this.yearsFraction()
-                           : this.plus({ years: this.off.years + n });
+                           : (assertSafeInt(n, 'years'), this.plus({ years: this.off.years + n }));
   }
 
   /**
@@ -277,7 +305,7 @@ class RelativeBuilder {
   months(n: number): RelativeBuilder; months(): number;
   months(n?: number): any {
     return n === undefined ? this.monthsFraction()
-                           : this.plus({ months: this.off.months + n });
+                           : (assertSafeInt(n, 'months'), this.plus({ months: this.off.months + n }));
   }
 
   /**
@@ -291,7 +319,7 @@ class RelativeBuilder {
   weeks(n: number): RelativeBuilder; weeks(): number;
   weeks(n?: number): any {
     return n === undefined ? this.deltaMs() / MS.week
-                           : this.plus({ days: this.off.days + n * 7 });
+                           : (assertSafeInt(n, 'weeks'), this.plus({ days: this.off.days + n * 7 }));
   }
 
   /**
@@ -305,7 +333,7 @@ class RelativeBuilder {
   days(n: number): RelativeBuilder; days(): number;
   days(n?: number): any {
     return n === undefined ? this.deltaMs() / MS.day
-                           : this.plus({ days: this.off.days + n });
+                           : (assertSafeInt(n, 'days'), this.plus({ days: this.off.days + n }));
   }
 
   /**
@@ -319,7 +347,7 @@ class RelativeBuilder {
   hours(n: number): RelativeBuilder; hours(): number;
   hours(n?: number): any {
     return n === undefined ? this.deltaMs() / MS.hour
-                           : this.plus({ hours: this.off.hours + n });
+                           : (assertSafeInt(n, 'hours'), this.plus({ hours: this.off.hours + n }));
   }
 
   /**
@@ -333,7 +361,7 @@ class RelativeBuilder {
   minutes(n: number): RelativeBuilder; minutes(): number;
   minutes(n?: number): any {
     return n === undefined ? this.deltaMs() / MS.minute
-                           : this.plus({ minutes: this.off.minutes + n });
+                           : (assertSafeInt(n, 'minutes'), this.plus({ minutes: this.off.minutes + n }));
   }
 
   /**
@@ -347,7 +375,7 @@ class RelativeBuilder {
   seconds(n: number): RelativeBuilder; seconds(): number;
   seconds(n?: number): any {
     return n === undefined ? this.deltaMs() / MS.second
-                           : this.plus({ seconds: this.off.seconds + n });
+                           : (assertSafeInt(n, 'seconds'), this.plus({ seconds: this.off.seconds + n }));
   }
 
   /**
@@ -361,7 +389,7 @@ class RelativeBuilder {
   milliseconds(n: number): RelativeBuilder; milliseconds(): number;
   milliseconds(n?: number): any {
     return n === undefined ? this.deltaMs()
-                           : this.plus({ milliseconds: this.off.milliseconds + n });
+                           : (assertSafeInt(n, 'milliseconds'), this.plus({ milliseconds: this.off.milliseconds + n }));
   }
 
   /**
@@ -390,6 +418,7 @@ export const fromDate = (d: Date | number | string): RelativeBuilder => {
   if (d instanceof Date) {
     date = new Date(d);
   } else if (typeof d === 'number') {
+    assertSafeInt(d, 'fromDate');
     date = new Date(d);
   } else if (typeof d === 'string') {
     date = new Date(d);

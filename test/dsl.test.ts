@@ -302,3 +302,102 @@ describe('RelativeBuilder – negative time travel', () => {
     expect(timestamp).to.be.lessThan(baseDate.getTime());
   });
 });
+
+describe('DurationBuilder – invalid number inputs', () => {
+  it('rejects NaN for weeks', () => {
+    expect(() => weeks(NaN)).to.throw('weeks: value must be a finite number');
+  });
+
+  it('rejects Infinity for days', () => {
+    expect(() => days(Infinity)).to.throw('days: value must be a finite number');
+    expect(() => days(-Infinity)).to.throw('days: value must be a finite number');
+  });
+
+  it('rejects unsafe integers for minutes', () => {
+    expect(() => minutes(Number.MAX_SAFE_INTEGER + 1)).to.throw('minutes: absolute value exceeds safe range');
+  });
+
+  it('rejects NaN in chained operations', () => {
+    expect(() => weeks(2).days(NaN)).to.throw('days: value must be a finite number');
+  });
+});
+
+describe('RelativeBuilder – invalid number inputs', () => {
+  const baseDate = new Date('2023-06-15T12:00:00Z');
+
+  it('rejects NaN for years', () => {
+    expect(() => fromDate(baseDate).years(NaN)).to.throw('years: value must be a finite integer');
+  });
+
+  it('rejects Infinity for months', () => {
+    expect(() => fromDate(baseDate).months(Infinity)).to.throw('months: value must be a finite integer');
+    expect(() => fromDate(baseDate).months(-Infinity)).to.throw('months: value must be a finite integer');
+  });
+
+  it('rejects decimals for weeks', () => {
+    expect(() => fromDate(baseDate).weeks(2.7)).to.throw('weeks: value must be an integer (no decimals)');
+  });
+
+  it('rejects unsafe integers for days', () => {
+    expect(() => fromDate(baseDate).days(Number.MAX_SAFE_INTEGER + 1)).to.throw('days: value exceeds safe integer range');
+  });
+
+  it('rejects NaN in chained operations', () => {
+    expect(() => fromDate(baseDate).years(1).hours(NaN)).to.throw('hours: value must be a finite integer');
+  });
+
+  it('rejects decimals in chained operations', () => {
+    expect(() => fromDate(baseDate).months(6).seconds(30.3)).to.throw('seconds: value must be an integer (no decimals)');
+  });
+});
+
+describe('fromDate – invalid timestamp inputs', () => {
+  it('rejects NaN timestamps', () => {
+    expect(() => fromDate(NaN)).to.throw('fromDate: value must be a finite integer');
+  });
+
+  it('rejects Infinity timestamps', () => {
+    expect(() => fromDate(Infinity)).to.throw('fromDate: value must be a finite integer');
+    expect(() => fromDate(-Infinity)).to.throw('fromDate: value must be a finite integer');
+  });
+
+  it('rejects decimal timestamps', () => {
+    expect(() => fromDate(1672531200000.5)).to.throw('fromDate: value must be an integer (no decimals)');
+  });
+
+  it('rejects unsafe integer timestamps', () => {
+    expect(() => fromDate(Number.MAX_SAFE_INTEGER + 1)).to.throw('fromDate: value exceeds safe integer range');
+  });
+
+  it('still accepts valid integer timestamps', () => {
+    const timestamp = 1672531200000;
+    const result = fromDate(timestamp);
+    expect(result.timestamp()).to.equal(timestamp);
+  });
+});
+
+describe('DurationBuilder – fractional durations', () => {
+  it('weeks with decimals', () => {
+    expect(weeks(1.5).days()).to.equal(10.5);
+  });
+
+  it('days with decimals', () => {
+    expect(days(1.5).hours()).to.equal(36);
+  });
+
+  it('hours with decimals', () => {
+    expect(hours(1.5).minutes()).to.equal(90);
+  });
+
+  it('minutes with decimals', () => {
+    expect(minutes(1.25).seconds()).to.equal(75);
+  });
+
+  it('seconds with decimals', () => {
+    expect(seconds(1.5).milliseconds()).to.equal(1500);
+  });
+
+  it('negative fractional durations', () => {
+    expect(days(-2.5).hours()).to.equal(-60);
+  });
+});
