@@ -1,5 +1,8 @@
 # temporal-api
 
+[![CI](https://img.shields.io/github/actions/workflow/status/klntsky/temporal-api/ci.yml?branch=master&logo=github)](https://github.com/klntsky/temporal-api/actions/workflows/ci.yml)
+[![npm downloads](https://img.shields.io/npm/dm/temporal-api?logo=npm)](https://www.npmjs.com/package/temporal-api)
+
 Time definition library with calendar-aware arithmetic, using tc39 Temporal API.
 
 ## Features
