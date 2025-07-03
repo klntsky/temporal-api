@@ -198,15 +198,22 @@ class RelativeBuilder {
   }
 
   private targetPlain(): Temporal.PlainDateTime {
-    return this.anchorPlain.add({
-      years:   this.off.years,
-      months:  this.off.months,
-      days:    this.off.days,
-      hours:   this.off.hours,
-      minutes: this.off.minutes,
-      seconds: this.off.seconds,
-      milliseconds: this.off.milliseconds
-    });
+    let result = this.anchorPlain;
+    
+    // Apply each offset individually to handle mixed signs
+    // Temporal does not support mixed-sign offsets in a single operation
+    const offsetOrder: (keyof Offsets)[] = [
+      'years', 'months', 'days', 'hours', 'minutes', 'seconds', 'milliseconds'
+    ];
+
+    for (const unit of offsetOrder) {
+      const value = this.off[unit];
+      if (value !== 0) {
+        result = result.add({ [unit]: value });
+      }
+    }
+    
+    return result;
   }
 
   private deltaMs(): number {
